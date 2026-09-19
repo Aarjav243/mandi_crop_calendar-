@@ -130,6 +130,48 @@ def latest_snapshot(series, curve, newest, base_level):
     return out
 
 
+def latest_volume_snapshot(series, curve, newest):
+    """The latest reported arrivals, and how they sit against that week's normal.
+
+    Compared in ratio space, for the same reason latest_snapshot is: a straight
+    tonnes-against-the-curve comparison reports a level shift as a seasonal
+    signal. Arrivals have no inflation, but they have the same problem from a
+    different cause -- how much gets reported drifts year to year as mandis
+    come and go from the feed. All-India Cauliflower runs about 4x its 2021
+    level at the same number of reporting states, so every single day of 2026
+    would have read "+200% above usual" against the multi-year median.
+
+    So the day's tonnes are divided by that year's own arrivals level first,
+    and only then compared with the week's share of a normal year. What comes
+    out answers the question a reader actually has -- is this week heavy or
+    light for the time of year? -- rather than restating that the feed carries
+    more than it used to.
+
+    `curve` is in absolute tonnes, so it is normalised to a shape here before
+    seasonality.year_level (which expects a curve of multiples-of-average) can
+    use it. No comparison is offered when the year is too thin to pin a level.
+
+    Returns None for a pair that has gone quiet, on the same STALE_DAYS rule as
+    the price snapshot: a June arrival figure is not "right now".
+    """
+    if not series:
+        return None
+    day, tonnes = series[-1]
+    if (newest - day).days > STALE_DAYS:
+        return None
+    week = seasonality.iso_week(day)
+    out = {"date": day.isoformat(), "tonnes": round(tonnes), "week": week}
+    mean = (sum(curve.values()) / len(curve)) if curve else 0
+    if mean > 0:
+        shape = {w: v / mean for w, v in curve.items()}
+        expected = shape.get(week)
+        level = seasonality.year_level(series, day.year, shape)
+        if level and expected:
+            out["normal"] = round(expected * level)
+            out["pct"] = round(((tonnes / level) / expected - 1) * 100)
+    return out
+
+
 def state_base(series, curve, nat_level):
     """-> (BASE_YEAR rupee level, how we got it, which year it came from).
 
@@ -160,18 +202,26 @@ def state_base(series, curve, nat_level):
     return nat_now, "national", seasonality.BASE_YEAR
 
 
-def attach_volume(entry, crop, state):
+def attach_volume(entry, crop, state, newest=None):
     """Adds a `volume` field (52 weekly arrivals figures in tonnes, plotted
     straight on the chart's y axis) to an entry dict, in place, if enough
     arrivals history exists for this pair. Independent of whether the price
     side had enough data -- a fallback/suppressed price pair can still have
-    its own real volume chart."""
-    vol = seasonality.volume_curve(crop, state)
+    its own real volume chart.
+
+    Also adds `nowVolume`: the latest day's actual arrivals, the arrivals
+    counterpart to `now`. The chart alone only ever said what a week typically
+    looks like; this says what turned up.
+    """
+    series = seasonality.load_daily_volume_series(crop, state)
+    vol = seasonality._volume_curve_series(series)
     if vol is not None:
         entry["volume"] = curve_to_list(vol, ndigits=1)  # 52 weekly tonnes, None gaps
+    if newest is not None:
+        entry["nowVolume"] = latest_volume_snapshot(series, vol, newest)
 
 
-def attach_national_volume(entry, crop, states):
+def attach_national_volume(entry, crop, states, newest=None):
     """All-India arrivals = every state's own weekly curve, ADDED together.
 
     Not a pooled daily median, which is what the price side does (correctly --
@@ -186,13 +236,24 @@ def attach_national_volume(entry, crop, states):
     Weeks no state covers stay absent, so the plot breaks the line there.
     """
     total = defaultdict(float)
+    # all-India arrivals on a given DAY, on the other hand, is a plain sum:
+    # every state that reported that day, added up. No medians involved, so
+    # the different-day-set problem above doesn't arise.
+    daily = defaultdict(float)
     for st in states:
-        curve = seasonality.volume_curve(crop, st)
+        series = seasonality.load_daily_volume_series(crop, st)
+        for d, tonnes in series:
+            daily[d] += tonnes
+        curve = seasonality._volume_curve_series(series)
         if curve:
             for w, tonnes in curve.items():
                 total[w] += tonnes
     if len(total) >= seasonality.MIN_WEEKS_COVERED:
         entry["volume"] = curve_to_list(total, ndigits=1)
+    if newest is not None:
+        entry["nowVolume"] = latest_volume_snapshot(
+            sorted(daily.items()), total, newest
+        )
 
 
 def plant_window_from_week(plant_week):
@@ -262,7 +323,7 @@ def build_data():
             return _cache[y]
 
         national[crop] = slim(nat_raw, *state_base(pooled, nat_curve, nat_level))
-        attach_national_volume(national[crop], crop, states)
+        attach_national_volume(national[crop], crop, states, newest)
         national[crop]["now"] = latest_snapshot(
             pooled, nat_curve, newest, national[crop].get("base_level")
         )
@@ -286,7 +347,7 @@ def build_data():
             else:
                 pairs[key] = slim(r)  # no national either -> honest blank
                 n_suppressed += 1
-            attach_volume(pairs[key], crop, st)
+            attach_volume(pairs[key], crop, st, newest)
             # a thin pair borrows the national shape for the comparison, the
             # same way it borrows it for the recommendation
             pairs[key]["now"] = latest_snapshot(
@@ -737,15 +798,30 @@ function recBlock(r, curveForPlot, crop) {
   // in the caption, because a reader comparing it to the chart will otherwise
   // read the inflation gap as a seasonal signal
   const now = r.now;
-  const nowBlock = !now ? "" : `<div class="now">
+  // Price and arrivals sit in the same block because a reader wants both at
+  // once: a high price on a thin arrival day means something different from a
+  // high price on a heavy one. Either half can be missing on its own -- volume
+  // history is shorter than price history, and some pairs report only one.
+  const priceLine = !now ? "" : `
     <div class="muted">Latest reported price</div>
     <div class="big">₹${now.price.toLocaleString("en-IN")} per quintal on ${fmtDate(now.date)}</div>
     <div class="muted">${now.pct == null
       ? "Not enough of this year's prices yet to say how that compares with normal."
       : vsNormal(now.pct) + (now.normal
           ? ` &mdash; the usual for week ${now.week} works out to about ₹${now.normal.toLocaleString("en-IN")} at this year's prices.`
-          : ".")}</div>
-  </div>`;
+          : ".")}</div>`;
+  const nowVol = r.nowVolume;
+  const volLine = !nowVol ? "" : `
+    <div class="muted" style="margin-top:${now ? "10px" : "0"}">Latest reported arrivals</div>
+    <div class="big">${nowVol.tonnes.toLocaleString("en-IN")} tonnes on ${fmtDate(nowVol.date)}</div>
+    <div class="muted">${nowVol.pct == null
+      ? "No usual level for this week to compare against yet."
+      : vsNormal(nowVol.pct) + (nowVol.normal
+          ? ` &mdash; the usual for week ${nowVol.week} is about ${nowVol.normal.toLocaleString("en-IN")} tonnes.`
+          : ".")
+        + " How many mandis reported that day moves this figure, so read it as a direction, not an exact count."}</div>`;
+  const nowBlock = (!now && !nowVol) ? "" :
+    `<div class="now">${priceLine}${volLine}</div>`;
 
   return `<div class="card">
     ${nowBlock}
