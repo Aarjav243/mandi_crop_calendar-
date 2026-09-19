@@ -1,19 +1,12 @@
 # Runs the pipeline on GitHub's own servers instead of this laptop, so it
 # updates whether or not the laptop is on, plugged in, or even open.
 #
-# NOT ACTIVE YET. This only takes effect once this project is pushed to a
-# GitHub repository -- it does nothing sitting on disk. To turn it on:
-#   1. git init            (this folder isn't a git repo yet)
-#   2. git add . && git commit -m "initial commit"
-#   3. create a repo on github.com and `git push` this to it
-#   4. in the repo's Settings -> Actions -> General, under "Workflow
-#      permissions", choose "Read and write permissions" (so the job below
-#      can commit the day's data back).
-# After that, this runs itself -- nothing more to do.
+# Live since 2026-09-19. Settings -> Actions -> General must stay on "Read and
+# write permissions" for the commit step below to push the day's data back.
 #
 # Times are UTC. 01:30 / 07:30 / 13:30 UTC = 07:00 / 13:00 / 19:00 IST, the
 # same three times as the Windows Task Scheduler job on the laptop. Once this
-# is live, the laptop's scheduled task is redundant and can be disabled.
+# is proven green, the laptop's scheduled task is redundant and can be disabled.
 name: Daily crop price update
 
 on:
@@ -26,9 +19,17 @@ on:
 permissions:
   contents: write
 
+# Two runs writing data/ at once would each push a different "latest" and one
+# would lose. Queue them instead; a scheduled run that overlaps a manual one
+# waits its turn rather than racing it.
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 60  # a wedged fetch should not burn a whole runner day
     steps:
       - uses: actions/checkout@v4
 
@@ -42,8 +43,29 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # agmarknet.py already retries a single call five times over ~75s, which
+      # rides out a blip but not an outage: on 2026-09-19 the API returned 503
+      # "no healthy upstream" for hours and the run failed. These attempts are
+      # spaced much wider so a short outage costs a few minutes, not the day's
+      # data. Three genuine failures over ~12 minutes is a real problem worth
+      # showing red.
       - name: Fetch today's prices and arrivals, rebuild the page
-        run: python daily_update.py
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::fetch attempt $attempt"
+            if python daily_update.py; then
+              echo "::endgroup::"
+              echo "fetch succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "::endgroup::"
+            if [ "$attempt" -lt 3 ]; then
+              echo "attempt $attempt failed -- Agmarknet may be down, waiting 5 minutes"
+              sleep 300
+            fi
+          done
+          echo "all three attempts failed; leaving the data as it was"
+          exit 1
 
       - name: Commit and push whatever changed
         if: always()  # a failed fetch still leaves earlier days worth saving
@@ -51,5 +73,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ volume/ build_cache.json crop_calendar.html reporting_log.jsonl
-          git diff --cached --quiet || git commit -m "Daily update: $(date -u +%Y-%m-%d)"
-          git push
+          git diff --cached --quiet && { echo "nothing changed"; exit 0; }
+          git commit -m "Daily update: $(date -u +%Y-%m-%d)"
+          # The laptop pushes backfills to this same branch, so the remote can
+          # have moved since checkout. Rebase onto it rather than failing the
+          # push -- the day's rows and a backfill's rows are different dates in
+          # the same files, so there is nothing genuinely in conflict.
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && \
+              git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            echo "push attempt $attempt failed; remote moved again, retrying"
+            sleep 10
+          done
+          echo "could not push after 3 attempts"
+          exit 1
