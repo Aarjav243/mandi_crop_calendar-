@@ -1,0 +1,1 @@
+{"crop": "Jowar", "state": "Odisha", "commodity_id": 5, "state_id": 21, "from_date": "2021-01-01", "to_date": "2025-12-31", "record_count": 2, "records": [{"date": "2022-03-30T00:00:00.000Z", "commodity_id": 5, "census_state_id": 21, "quantity": 10}, {"date": "2022-04-18T00:00:00.000Z", "commodity_id": 5, "census_state_id": 21, "quantity": 20}]}

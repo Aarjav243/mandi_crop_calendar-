@@ -1,0 +1,1 @@
+{"crop": "Turmeric", "state": "Ladakh", "commodity_id": 39, "state_id": 1, "from_date": "2021-01-01", "to_date": "2025-12-31", "record_count": 2, "records": [{"date": "2021-10-20T00:00:00.000Z", "commodity_id": 39, "census_state_id": 1, "quantity": 0.03}, {"date": "2021-11-02T00:00:00.000Z", "commodity_id": 39, "census_state_id": 1, "quantity": 0.05}]}

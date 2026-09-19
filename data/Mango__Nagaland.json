@@ -1,0 +1,1 @@
+{"crop": "Mango", "state": "Nagaland", "commodity_id": 20, "state_id": 13, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "source": "ceda_web", "records": [{"date": "2023-08-26T00:00:00.000Z", "commodity_id": 20, "census_state_id": 13, "min_price": 9800, "max_price": 10100, "modal_price": 9900, "census_district_id": null, "market_id": null}]}

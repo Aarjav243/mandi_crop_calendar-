@@ -1,0 +1,1 @@
+{"crop": "Sesamum", "state": "Odisha", "commodity_id": 11, "state_id": 21, "from_date": "2021-01-01", "to_date": "2025-12-31", "record_count": 2, "records": [{"date": "2021-04-22T00:00:00.000Z", "commodity_id": 11, "census_state_id": 21, "quantity": 25}, {"date": "2022-05-05T00:00:00.000Z", "commodity_id": 11, "census_state_id": 21, "quantity": 8}]}

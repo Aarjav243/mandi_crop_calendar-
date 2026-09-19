@@ -1,0 +1,20 @@
+# Raw Kaggle CSV downloads -- 2.7 GB of source material, already processed into
+# data/ and volume/. Individual files exceed GitHub's 100 MB hard limit, and
+# nothing in the pipeline reads them after build_volume_from_kaggle.py has run.
+kaggle_raw/
+
+# Local snapshot taken before the Sept 2026 source migration. Keep it on disk,
+# don't ship it -- git history already serves this purpose once we're pushed.
+Well Labs 10 data-backup-*/
+
+# Logs are machine-local and rewritten constantly; committing them would make
+# every cloud run conflict with the laptop's copy.
+*.log
+
+__pycache__/
+*.pyc
+.DS_Store
+
+# Transient scrape output from one-off runs; not part of the pipeline.
+*.out
+*.err

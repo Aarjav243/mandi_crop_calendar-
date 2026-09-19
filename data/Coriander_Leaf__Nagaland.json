@@ -1,0 +1,1 @@
+{"crop": "Coriander Leaf", "state": "Nagaland", "commodity_id": 43, "state_id": 13, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "source": "ceda_web", "records": [{"date": "2025-03-07T00:00:00.000Z", "commodity_id": 43, "census_state_id": 13, "min_price": 1000, "max_price": 2000, "modal_price": 1500, "census_district_id": null, "market_id": null}]}

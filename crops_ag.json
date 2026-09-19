@@ -1,0 +1,142 @@
+{
+ "Apple": {
+  "name": "Apple",
+  "id": 17
+ },
+ "Bajra": {
+  "name": "Bajra(Pearl Millet/Cumbu)",
+  "id": 28
+ },
+ "Banana": {
+  "name": "Banana",
+  "id": 19
+ },
+ "Barley": {
+  "name": "Barley(Jau)",
+  "id": 29
+ },
+ "Brinjal": {
+  "name": "Brinjal",
+  "id": 32
+ },
+ "Cabbage": {
+  "name": "Cabbage",
+  "id": 126
+ },
+ "Castor": {
+  "name": "Castor Seed",
+  "id": 106
+ },
+ "Cauliflower": {
+  "name": "Cauliflower",
+  "id": 31
+ },
+ "Coriander Leaf": {
+  "name": "Coriander(Leaves)",
+  "id": 39
+ },
+ "Cotton": {
+  "name": "Cotton",
+  "id": 15
+ },
+ "Dry Chilli": {
+  "name": "Dry Chillies",
+  "id": 113
+ },
+ "Garlic": {
+  "name": "Garlic",
+  "id": 25
+ },
+ "Ginger": {
+  "name": "Ginger(Dry)",
+  "id": 27
+ },
+ "Gram": {
+  "name": "Bengal Gram(Gram)(Whole)",
+  "id": 6
+ },
+ "Green Chilli": {
+  "name": "Green Chilli",
+  "id": 73
+ },
+ "Groundnut": {
+  "name": "Groundnut",
+  "id": 10
+ },
+ "Jowar": {
+  "name": "Jowar(Sorghum)",
+  "id": 5
+ },
+ "Maize": {
+  "name": "Maize",
+  "id": 4
+ },
+ "Mango": {
+  "name": "Mango",
+  "id": 20
+ },
+ "Masoor": {
+  "name": "Lentil(Masur)(Whole)",
+  "id": 52
+ },
+ "Moong": {
+  "name": "Green Gram(Moong)(Whole)",
+  "id": 9
+ },
+ "Mustard": {
+  "name": "Mustard",
+  "id": 12
+ },
+ "Okra": {
+  "name": "Bhindi(Ladies Finger)",
+  "id": 71
+ },
+ "Onion": {
+  "name": "Onion",
+  "id": 23
+ },
+ "Paddy": {
+  "name": "Paddy(Common)",
+  "id": 2
+ },
+ "Potato": {
+  "name": "Potato",
+  "id": 24
+ },
+ "Sesamum": {
+  "name": "Sesamum(Sesame,Gingelly,Til)",
+  "id": 11
+ },
+ "Soybean": {
+  "name": "Soyabean",
+  "id": 13
+ },
+ "Sugarcane": {
+  "name": "Sugarcane",
+  "id": 122
+ },
+ "Sunflower": {
+  "name": "Sunflower/Sunflower Seed",
+  "id": 14
+ },
+ "Tomato": {
+  "name": "Tomato",
+  "id": 65
+ },
+ "Tur/Arhar": {
+  "name": "Red gram/Arhar/Tur(whole)",
+  "id": 45
+ },
+ "Turmeric": {
+  "name": "Turmeric",
+  "id": 35
+ },
+ "Urad": {
+  "name": "Black Gram(Urd Beans)(Whole)",
+  "id": 8
+ },
+ "Wheat": {
+  "name": "Wheat",
+  "id": 1
+ }
+}

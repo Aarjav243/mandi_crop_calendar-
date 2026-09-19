@@ -1,0 +1,1 @@
+{"crop": "Groundnut", "state": "Himachal Pradesh", "commodity_id": 10, "state_id": 2, "from_date": "2003-05-28", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2003-05-28T00:00:00.000Z", "commodity_id": 10, "census_state_id": 2, "census_district_id": null, "market_id": null, "min_price": 15000.0, "max_price": 16000.0, "modal_price": 15500.0}]}

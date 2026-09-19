@@ -1,0 +1,1 @@
+{"crop": "Sunflower", "state": "Bihar", "commodity_id": 14, "state_id": 10, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2015-02-05T00:00:00.000Z", "commodity_id": 14, "census_state_id": 10, "min_price": 12500, "max_price": 13000, "modal_price": 12750, "census_district_id": null, "market_id": null}]}

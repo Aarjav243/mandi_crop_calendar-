@@ -1,0 +1,1 @@
+{"crop": "Soybean", "state": "Delhi", "commodity_id": 13, "state_id": 7, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2014-05-20T00:00:00.000Z", "commodity_id": 13, "census_state_id": 7, "min_price": 3695, "max_price": 4935, "modal_price": 4315, "census_district_id": null, "market_id": null}]}

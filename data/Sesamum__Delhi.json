@@ -1,0 +1,1 @@
+{"crop": "Sesamum", "state": "Delhi", "commodity_id": 11, "state_id": 7, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2010-10-22T00:00:00.000Z", "commodity_id": 11, "census_state_id": 7, "min_price": 1400, "max_price": 2000, "modal_price": 1500, "census_district_id": null, "market_id": null}]}

@@ -1,0 +1,1 @@
+{"crop": "Bajra", "state": "Nagaland", "commodity_id": 28, "state_id": 13, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2007-01-02T00:00:00.000Z", "commodity_id": 28, "census_state_id": 13, "min_price": 1600, "max_price": 1675, "modal_price": 1625, "census_district_id": null, "market_id": null}]}

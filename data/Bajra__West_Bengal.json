@@ -1,0 +1,1 @@
+{"crop": "Bajra", "state": "West Bengal", "commodity_id": 28, "state_id": 19, "from_date": "2005-01-01", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2006-11-24T00:00:00.000Z", "commodity_id": 28, "census_state_id": 19, "min_price": 200, "max_price": 230, "modal_price": 220, "census_district_id": null, "market_id": null}]}

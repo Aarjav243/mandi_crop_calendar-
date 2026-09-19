@@ -1,0 +1,1 @@
+{"crop": "Sunflower", "state": "Assam", "commodity_id": 14, "state_id": 18, "from_date": "2002-10-23", "to_date": "2025-12-31", "record_count": 1, "records": [{"date": "2002-10-23T00:00:00.000Z", "commodity_id": 14, "census_state_id": 18, "census_district_id": null, "market_id": null, "min_price": 2000.0, "max_price": 2500.0, "modal_price": 2300.0}]}
