@@ -66,8 +66,19 @@ def wait_for_chain():
 
 
 def main():
-    wait_for_chain()
-    print(f"{dt.datetime.now():%H:%M:%S} chain finished; re-measuring gaps", flush=True)
+    args = sys.argv[1:]
+    if "--no-wait" not in args:
+        wait_for_chain()
+    # Agmarknet rate-limits a client that has been pulling hard for an hour,
+    # and once it does, retrying inside the same window just keeps the limit
+    # alive. Resting before the first call is the difference between starting
+    # clean and spending the evening collecting 429s.
+    if "--rest" in args:
+        mins = int(args[args.index("--rest") + 1])
+        print(f"{dt.datetime.now():%H:%M:%S} resting {mins} min to clear the rate limit",
+              flush=True)
+        time.sleep(mins * 60)
+    print(f"{dt.datetime.now():%H:%M:%S} measuring gaps", flush=True)
 
     for round_no in (1, 2):
         gaps = to_ranges(missing_days())
