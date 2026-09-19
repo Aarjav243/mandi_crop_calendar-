@@ -775,12 +775,29 @@ function recBlock(r, curveForPlot, crop) {
        Hover a point for that week's figure. Volume data covers 2021 onward, shorter history than prices.`
     : `This is the all-India arrivals pattern &mdash; ${r.state || "this state"} doesn't have enough
        arrivals data of its own yet. Hover a point for that week's figure.`;
-  const volSection = vol ? `
+  // The latest actual arrivals belong with the arrivals chart rather than
+  // beside the price: the chart says what a week normally looks like, this
+  // says what turned up. One panel, one question. It sits above the chart
+  // because "what arrived" is the thing a reader came for; the pattern is
+  // context for it.
+  const nowVol = r.nowVolume;
+  const volLine = !nowVol ? "" : `
+    <div class="muted">Latest reported arrivals</div>
+    <div class="big">${nowVol.tonnes.toLocaleString("en-IN")} tonnes on ${fmtDate(nowVol.date)}</div>
+    <div class="muted" style="margin-bottom:10px">${nowVol.pct == null
+      ? "No usual level for this week to compare against yet."
+      : vsNormal(nowVol.pct) + (nowVol.normal
+          ? ` &mdash; the usual for week ${nowVol.week} is about ${nowVol.normal.toLocaleString("en-IN")} tonnes.`
+          : ".")
+        + " How many mandis reported that day moves this figure, so read it as a direction, not an exact count."}</div>`;
+  const volSection = `
     <h3 style="font-size:.95rem;margin:16px 0 4px;color:#48504d">Arrivals pattern (mandi volume)</h3>
-    ${plotVolume(vol)}
-    <div class="muted" style="margin-top:2px">${volNote}</div>` : `
-    <h3 style="font-size:.95rem;margin:16px 0 4px;color:#48504d">Arrivals pattern (mandi volume)</h3>
-    <div class="muted">No arrivals data available for this crop and state.</div>`;
+    ${volLine}
+    ${vol
+      ? plotVolume(vol) + `<div class="muted" style="margin-top:2px">${volNote}</div>`
+      : `<div class="muted">${nowVol
+          ? "Not enough history yet to show a typical week-by-week pattern."
+          : "No arrivals data available for this crop and state."}</div>`}`;
   const relText = r.reliability == null ? "" :
     ` <span class="muted">In ${pct(r.reliability)} of those years, prices that week beat the year's average.</span>`;
   let plant;
@@ -798,10 +815,6 @@ function recBlock(r, curveForPlot, crop) {
   // in the caption, because a reader comparing it to the chart will otherwise
   // read the inflation gap as a seasonal signal
   const now = r.now;
-  // Price and arrivals sit in the same block because a reader wants both at
-  // once: a high price on a thin arrival day means something different from a
-  // high price on a heavy one. Either half can be missing on its own -- volume
-  // history is shorter than price history, and some pairs report only one.
   const priceLine = !now ? "" : `
     <div class="muted">Latest reported price</div>
     <div class="big">₹${now.price.toLocaleString("en-IN")} per quintal on ${fmtDate(now.date)}</div>
@@ -810,18 +823,7 @@ function recBlock(r, curveForPlot, crop) {
       : vsNormal(now.pct) + (now.normal
           ? ` &mdash; the usual for week ${now.week} works out to about ₹${now.normal.toLocaleString("en-IN")} at this year's prices.`
           : ".")}</div>`;
-  const nowVol = r.nowVolume;
-  const volLine = !nowVol ? "" : `
-    <div class="muted" style="margin-top:${now ? "10px" : "0"}">Latest reported arrivals</div>
-    <div class="big">${nowVol.tonnes.toLocaleString("en-IN")} tonnes on ${fmtDate(nowVol.date)}</div>
-    <div class="muted">${nowVol.pct == null
-      ? "No usual level for this week to compare against yet."
-      : vsNormal(nowVol.pct) + (nowVol.normal
-          ? ` &mdash; the usual for week ${nowVol.week} is about ${nowVol.normal.toLocaleString("en-IN")} tonnes.`
-          : ".")
-        + " How many mandis reported that day moves this figure, so read it as a direction, not an exact count."}</div>`;
-  const nowBlock = (!now && !nowVol) ? "" :
-    `<div class="now">${priceLine}${volLine}</div>`;
+  const nowBlock = !now ? "" : `<div class="now">${priceLine}</div>`;
 
   return `<div class="card">
     ${nowBlock}
