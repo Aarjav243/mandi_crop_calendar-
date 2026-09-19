@@ -447,7 +447,11 @@ HTML_TEMPLATE = r"""<!doctype html>
   tr.pick:hover td { background: #f2f6f2; }
   td.thin { color: #a08a5a; }
   .now { border-left: 3px solid #c2612f; padding: 1px 0 1px 12px; margin: 0 0 14px; }
-  .now .big { font-size: 1.25rem; font-weight: 700; margin: 2px 0 4px; }
+  /* Same bold-headline treatment as .now, in the arrivals-chart's own brown
+     (matches the line in plotVolume) so the figure reads as tied to that
+     chart rather than to the price above it. */
+  .now-vol { border-left: 3px solid #a06a2f; padding: 1px 0 1px 12px; margin: 8px 0 10px; }
+  .now .big, .now-vol .big { font-size: 1.25rem; font-weight: 700; margin: 2px 0 4px; }
   .up { color: #b04a22; font-weight: 600; }
   .down { color: #3c6b45; font-weight: 600; }
   details.latest { background: #fff; border: 1px solid #e2e0d8; border-radius: 10px;
@@ -782,14 +786,16 @@ function recBlock(r, curveForPlot, crop) {
   // context for it.
   const nowVol = r.nowVolume;
   const volLine = !nowVol ? "" : `
-    <div class="muted">Latest reported arrivals</div>
-    <div class="big">${nowVol.tonnes.toLocaleString("en-IN")} tonnes on ${fmtDate(nowVol.date)}</div>
-    <div class="muted" style="margin-bottom:10px">${nowVol.pct == null
-      ? "No usual level for this week to compare against yet."
-      : vsNormal(nowVol.pct) + (nowVol.normal
-          ? ` &mdash; the usual for week ${nowVol.week} is about ${nowVol.normal.toLocaleString("en-IN")} tonnes.`
-          : ".")
-        + " How many mandis reported that day moves this figure, so read it as a direction, not an exact count."}</div>`;
+    <div class="now-vol">
+      <div class="muted">Latest reported arrivals</div>
+      <div class="big">${nowVol.tonnes.toLocaleString("en-IN")} tonnes on ${fmtDate(nowVol.date)}</div>
+      <div class="muted">${nowVol.pct == null
+        ? "No usual level for this week to compare against yet."
+        : vsNormal(nowVol.pct) + (nowVol.normal
+            ? ` &mdash; the usual for week ${nowVol.week} is about ${nowVol.normal.toLocaleString("en-IN")} tonnes.`
+            : ".")
+          + " How many mandis reported that day moves this figure, so read it as a direction, not an exact count."}</div>
+    </div>`;
   const volSection = `
     <h3 style="font-size:.95rem;margin:16px 0 4px;color:#48504d">Arrivals pattern (mandi volume)</h3>
     ${volLine}
