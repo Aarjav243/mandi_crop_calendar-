@@ -35,11 +35,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
+
+      # seasonality.py needs statsmodels (STL) and numpy. Everything else is
+      # standard library, so this is the whole dependency story.
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Fetch today's prices and arrivals, rebuild the page
         run: python daily_update.py
 
       - name: Commit and push whatever changed
+        if: always()  # a failed fetch still leaves earlier days worth saving
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

@@ -1,0 +1,6 @@
+# seasonality.py uses statsmodels' STL decomposition as a second opinion on the
+# peak week (the "STL disagrees" flag); statsmodels pulls numpy, scipy, pandas.
+# Everything else in the pipeline is standard library on purpose -- Agmarknet is
+# plain urllib, so a cloud run needs nothing beyond this.
+numpy>=1.26
+statsmodels>=0.14
