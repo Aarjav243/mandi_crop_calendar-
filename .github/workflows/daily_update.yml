@@ -4,16 +4,23 @@
 # Live since 2026-09-19. Settings -> Actions -> General must stay on "Read and
 # write permissions" for the commit step below to push the day's data back.
 #
-# Times are UTC. 01:30 / 07:30 / 13:30 UTC = 07:00 / 13:00 / 19:00 IST, the
-# same three times as the Windows Task Scheduler job on the laptop. Once this
-# is proven green, the laptop's scheduled task is redundant and can be disabled.
+# Times are UTC. 01:23 / 07:23 / 13:23 UTC = 06:53 / 12:53 / 18:53 IST, near
+# enough the laptop's three Task Scheduler times. The odd minute is deliberate:
+# GitHub runs scheduled workflows on a best-effort basis and sheds them when
+# busy, and :00 and :30 are the most contended minutes on the platform. The
+# 13:30 run on 2026-09-19 never fired at all.
+#
+# A dropped run costs time, not data: dates_to_fetch resumes from the newest
+# date on disk, so the next run that does fire collects everything missed.
+# Keep the laptop's scheduled task until this has been green for several days
+# running -- it is the backstop for exactly this.
 name: Daily crop price update
 
 on:
   schedule:
-    - cron: "30 1 * * *"
-    - cron: "30 7 * * *"
-    - cron: "30 13 * * *"
+    - cron: "23 1 * * *"
+    - cron: "23 7 * * *"
+    - cron: "23 13 * * *"
   workflow_dispatch: {}  # lets you trigger a run by hand from the Actions tab
 
 permissions:
