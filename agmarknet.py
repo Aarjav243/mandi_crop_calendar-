@@ -64,6 +64,11 @@ TIMEOUT = 180
 THROTTLE = 1.0
 RETRIES = 5
 RETRY_WAIT = 5.0
+# A 429 is the server asking us to slow down, and it means it for longer than
+# the ordinary ladder lasts: a long backfill hammering at THROTTLE finally got
+# one on 2026-08-22, burned all five tries inside 75s, and lost the range.
+# 60s doubling gives 60+120+240+480 = 15 minutes, which the limit does clear.
+RATE_LIMIT_WAIT = 60.0
 MAX_PAGES = 40  # ~20k market-rows for one crop-day; far above the ~750 seen
 
 # Agmarknet publishes a day sooner than data.gov.in, so we can take yesterday.
@@ -195,10 +200,17 @@ def _post(body, tries=RETRIES):
             req = urllib.request.Request(API, data=data, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
                 return json.loads(r.read().decode())
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError):
+        except (
+            urllib.error.HTTPError,
+            urllib.error.URLError,
+            TimeoutError,
+            OSError,
+        ) as e:
             if attempt == tries - 1:
                 raise
-            time.sleep(RETRY_WAIT * 2**attempt)
+            rate_limited = getattr(e, "code", None) == 429
+            base = RATE_LIMIT_WAIT if rate_limited else RETRY_WAIT
+            time.sleep(base * 2**attempt)
     raise RuntimeError("unreachable")
 
 

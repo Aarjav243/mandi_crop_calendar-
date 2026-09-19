@@ -137,6 +137,49 @@ def test_never_fetches_the_future():
     assert all(d < dt.date(2026, 9, 19) for d in days), days
 
 
+def _retry_waits(code):
+    """Sleep lengths _post would use if every call failed with `code`.
+
+    Stubs out the network and the clock, so this measures the backoff policy
+    rather than spending fifteen real minutes proving it.
+    """
+    import urllib.error
+    import urllib.request
+
+    waits = []
+    real_urlopen, real_sleep = urllib.request.urlopen, ag.time.sleep
+
+    def boom(*a, **k):
+        raise urllib.error.HTTPError("u", code, "nope", {}, None)
+
+    urllib.request.urlopen = boom
+    ag.time.sleep = waits.append
+    try:
+        ag._post({"x": 1})
+    except urllib.error.HTTPError:
+        pass
+    finally:
+        urllib.request.urlopen = real_urlopen
+        ag.time.sleep = real_sleep
+    return waits
+
+
+def test_a_rate_limit_backs_off_far_longer_than_a_glitch():
+    # 429 means "you are asking too fast", not "that one call glitched". The
+    # ordinary 5-10-20-40 ladder spends all five tries inside 75 seconds,
+    # comfortably inside a limit window that outlasts it -- which is exactly
+    # how a 70-minute backfill died on a single 429 at 2026-08-22.
+    limited = sum(_retry_waits(429))
+    glitch = sum(_retry_waits(503))
+    assert limited >= 600, f"429 backoff is only {limited}s"
+    assert limited > glitch * 5, f"429 {limited}s barely differs from 503 {glitch}s"
+
+
+def test_an_ordinary_gateway_error_still_retries_quickly():
+    # A 503 blip should not cost fifteen minutes; the fast ladder stays.
+    assert sum(_retry_waits(503)) <= 120
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
