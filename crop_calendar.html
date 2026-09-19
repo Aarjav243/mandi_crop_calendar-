@@ -130,31 +130,6 @@ const DATA = JSON.parse(document.getElementById("blob").textContent);
 const $ = s => document.querySelector(s);
 document.getElementById("gen").textContent = DATA.generated;
 
-// How fresh is the data, right now (computed from the viewer's clock, not the
-// build's, so this stays honest no matter how long ago the page was built).
-(function renderFreshness() {
-  const el = document.getElementById("freshness");
-  const newest = new Date(DATA.newest + "T00:00:00Z");
-  const ageDays = Math.floor((Date.now() - newest.getTime()) / 86400000);
-  const curve = DATA.settleCurve || {};
-  const settlePct = ageDays <= 0 ? null
-    : ageDays >= DATA.settleRevisionDays ? 100
-    : Math.round((curve[String(ageDays)] ?? 0.75) * 100);
-
-  let html = `<div class="muted">Prices and arrivals current through
-    <strong>${fmtDate(DATA.newest)}</strong>.</div>`;
-  if (settlePct != null && settlePct < 99) {
-    html += `<div class="flag">About ${settlePct}% of mandis have reported for that day
-      so far &mdash; mandis file late, so the most recent days are still being corrected
-      as more come in. This figure settles over the next ${DATA.settleRevisionDays} days.</div>`;
-  }
-  if (ageDays > DATA.staleWarningDays) {
-    html += `<div class="flag warn">No newer data has arrived in ${ageDays} days
-      (expected daily). The scheduled update may not be running &mdash; worth checking.</div>`;
-  }
-  el.innerHTML = html;
-})();
-
 const cropSel = $("#crop"), stateSel = $("#state"), panel = $("#panel"),
       tableWrap = $("#stateTableWrap"), latestWrap = $("#latestWrap");
 
@@ -191,6 +166,31 @@ function fmtDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
   return `${d} ${MONTHS_FULL[m - 1]} ${y}`;
 }
+
+// How fresh is the data, right now (computed from the viewer's clock, not the
+// build's, so this stays honest no matter how long ago the page was built).
+(function renderFreshness() {
+  const el = document.getElementById("freshness");
+  const newest = new Date(DATA.newest + "T00:00:00Z");
+  const ageDays = Math.floor((Date.now() - newest.getTime()) / 86400000);
+  const curve = DATA.settleCurve || {};
+  const settlePct = ageDays <= 0 ? null
+    : ageDays >= DATA.settleRevisionDays ? 100
+    : Math.round((curve[String(ageDays)] ?? 0.75) * 100);
+
+  let html = `<div class="muted">Prices and arrivals current through
+    <strong>${fmtDate(DATA.newest)}</strong>.</div>`;
+  if (settlePct != null && settlePct < 99) {
+    html += `<div class="flag">About ${settlePct}% of mandis have reported for that day
+      so far &mdash; mandis file late, so the most recent days are still being corrected
+      as more come in. This figure settles over the next ${DATA.settleRevisionDays} days.</div>`;
+  }
+  if (ageDays > DATA.staleWarningDays) {
+    html += `<div class="flag warn">No newer data has arrived in ${ageDays} days
+      (expected daily). The scheduled update may not be running &mdash; worth checking.</div>`;
+  }
+  el.innerHTML = html;
+})();
 // How the latest price sits against the twenty-year normal for that week.
 // Inside an SVG <title> markup would show up as literal text, so pass plain.
 function vsNormal(p, plain) {
