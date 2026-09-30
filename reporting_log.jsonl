@@ -156,3 +156,8 @@
 {"date": "2026-09-26", "run_date": "2026-09-29", "market_rows": 7005}
 {"date": "2026-09-27", "run_date": "2026-09-29", "market_rows": 5164}
 {"date": "2026-09-28", "run_date": "2026-09-29", "market_rows": 9613}
+{"date": "2026-09-25", "run_date": "2026-09-30", "market_rows": 8212}
+{"date": "2026-09-26", "run_date": "2026-09-30", "market_rows": 7012}
+{"date": "2026-09-27", "run_date": "2026-09-30", "market_rows": 5166}
+{"date": "2026-09-28", "run_date": "2026-09-30", "market_rows": 9624}
+{"date": "2026-09-29", "run_date": "2026-09-30", "market_rows": 8897}
