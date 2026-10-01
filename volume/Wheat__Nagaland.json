@@ -1,1 +1,1 @@
-{"crop": "Wheat", "state": "Nagaland", "commodity_id": 1, "state_id": 13, "from_date": "2021-01-01", "to_date": "2025-12-31", "record_count": 0, "records": []}
+{"crop": "Wheat", "state": "Nagaland", "commodity_id": 1, "state_id": 13, "from_date": "2021-01-01", "to_date": "2026-09-30", "record_count": 1, "records": [{"date": "2026-09-30T00:00:00.000Z", "commodity_id": 1, "census_state_id": 13, "quantity": 0.3}], "backfill_source": "agmarknet.gov.in:dashboard-data"}
