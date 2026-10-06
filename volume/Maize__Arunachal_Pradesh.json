@@ -1,1 +1,1 @@
-{"crop": "Maize", "state": "Arunachal Pradesh", "commodity_id": 4, "state_id": 12, "from_date": "2021-01-01", "to_date": "2025-12-31", "record_count": 0, "records": []}
+{"crop": "Maize", "state": "Arunachal Pradesh", "commodity_id": 4, "state_id": 12, "from_date": "2021-01-01", "to_date": "2026-10-05", "record_count": 1, "records": [{"date": "2026-10-05T00:00:00.000Z", "commodity_id": 4, "census_state_id": 12, "quantity": 1.0}], "backfill_source": "agmarknet.gov.in:dashboard-data"}
