@@ -798,3 +798,8 @@
 {"date": "2026-11-07", "run_date": "2026-11-11", "market_rows": 5880}
 {"date": "2026-11-08", "run_date": "2026-11-11", "market_rows": 3472}
 {"date": "2026-11-09", "run_date": "2026-11-11", "market_rows": 5027}
+{"date": "2026-11-07", "run_date": "2026-11-12", "market_rows": 5900}
+{"date": "2026-11-08", "run_date": "2026-11-12", "market_rows": 3483}
+{"date": "2026-11-09", "run_date": "2026-11-12", "market_rows": 5045}
+{"date": "2026-11-10", "run_date": "2026-11-12", "market_rows": 6146}
+{"date": "2026-11-11", "run_date": "2026-11-12", "market_rows": 6142}
